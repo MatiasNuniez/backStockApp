@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, IsDate, IsDateString} from "class-validator";
+import { IsNotEmpty, IsString, IsNumber, IsDateString} from "class-validator";
 
 
 export class CreateProductDto {
@@ -13,6 +13,10 @@ export class CreateProductDto {
     @IsNotEmpty()
     @IsNumber()
     stock: number;
+    
+    @IsNotEmpty()
+    @IsNumber()
+    quantity: number;
 
     @IsNotEmpty()
     @IsNumber()
