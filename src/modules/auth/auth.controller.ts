@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 
@@ -12,4 +12,8 @@ export class AuthController {
     return this.authService.create(createAuthDto);
   }
 
+  @Get('verify')
+  verifyToken(@Headers('Authorization') token: string) {
+    return this.authService.verifyToken(token);
+  }
 }

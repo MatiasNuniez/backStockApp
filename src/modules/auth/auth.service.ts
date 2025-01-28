@@ -6,11 +6,11 @@ import * as jwt from 'jsonwebtoken';
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UserService) { }
+
   async create(createAuthDto: CreateUserDto) {
     try {
       const user = await this.userService.findOneByEmail(createAuthDto.email);
-      console.log(createAuthDto);
-      
+
       if (!user) {
         throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
       }
@@ -19,7 +19,7 @@ export class AuthService {
         throw new HttpException('Contraseña incorrecta', HttpStatus.BAD_REQUEST);
       }
 
-      if(!process.env.JWT_SECRET){
+      if (!process.env.JWT_SECRET) {
         throw new HttpException('Error interno del server', HttpStatus.INTERNAL_SERVER_ERROR);
       }
 
@@ -31,4 +31,21 @@ export class AuthService {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+
+    async verifyToken(token: string) {
+      try {
+        if (!process.env.JWT_SECRET) {
+          throw new HttpException('Error interno del servidor', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+  
+        const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
+  
+        return { valid: true, decoded };
+      } catch (error) {
+        return { valid: false, error: error.message }; 
+      }
+    }
+
+
 }

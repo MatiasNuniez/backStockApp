@@ -11,6 +11,8 @@ export class ProductsService {
   constructor(@InjectRepository(Product) private productRepository: Repository<Product>) { }
 
   async create(createProductDto: CreateProductDto) {
+    console.log(createProductDto);
+    
     try {
       const newProduct = this.productRepository.create(createProductDto);
       return await this.productRepository.save(newProduct);
