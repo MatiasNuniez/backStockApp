@@ -20,7 +20,4 @@ export class Product {
     @Column()
     category: number;
 
-    @Column()
-    dateSell: number;
-
 }
