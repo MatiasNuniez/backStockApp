@@ -19,5 +19,4 @@ export class Product {
 
     @Column()
     category: number;
-
 }
