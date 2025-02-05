@@ -7,6 +7,7 @@ async function bootstrap() {
     origin: process.env.HOST_CLIENT,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Accept, Authorization',
+    credentials:true
   });
   await app.listen(process.env.PORT ?? 3000);
 }

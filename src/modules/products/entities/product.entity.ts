@@ -1,22 +1,23 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Category } from "../../categories/entities/category.entity"
 
 @Entity()
 export class Product {
     @PrimaryGeneratedColumn()
     id: number;
-
-    @Column({ unique: true })
+  
+    @Column()
     name: string;
-
-    @Column("decimal", { precision: 5, scale: 2 })
+  
+    @Column('decimal')
     price: number;
-
+  
     @Column()
     stock: number;
-
+  
     @Column()
     quantity: number;
-
-    @Column()
-    category: number;
+  
+    @ManyToOne(() => Category, (category) => category.products, { nullable: false, onDelete: 'CASCADE' })
+    category: Category;
 }

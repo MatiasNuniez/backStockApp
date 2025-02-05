@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpCode, HttpStatus, Headers, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 
@@ -8,8 +9,10 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  Login(@Body() createAuthDto: CreateUserDto) {
-    return this.authService.create(createAuthDto);
+  async Login(@Body() createAuthDto: CreateUserDto, @Res({ passthrough: true }) res: Response) {
+    const token = await this.authService.create(createAuthDto);
+    res.cookie('token', token);
+    return { msj: 'Inicio exitoso' };
   }
 
   @Get('verify')
