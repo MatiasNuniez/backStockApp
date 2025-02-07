@@ -21,4 +21,8 @@ export class CreateProductDto {
     @IsNotEmpty()
     @IsNumber()
     category: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    userId:number;
 }

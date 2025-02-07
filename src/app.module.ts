@@ -31,7 +31,7 @@ export class AppModule {
     consumer
       .apply(ApiCheckMiddleware)
       .exclude({ path: 'auth/login', method: RequestMethod.POST },
-        { path: '/register', method: RequestMethod.POST }
+        { path: 'user/register', method: RequestMethod.POST }
       )
       .forRoutes('*');
   }

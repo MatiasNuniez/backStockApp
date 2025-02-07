@@ -10,7 +10,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async Login(@Body() createAuthDto: CreateUserDto, @Res({ passthrough: true }) res: Response) {
-    const token = await this.authService.create(createAuthDto);
+    const {user_id, token} = await this.authService.create(createAuthDto);
+    res.cookie('userId',user_id);
     res.cookie('token', token);
     return { msj: 'Inicio exitoso' };
   }

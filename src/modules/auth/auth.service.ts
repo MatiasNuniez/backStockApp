@@ -25,7 +25,11 @@ export class AuthService {
 
       let token = jwt.sign({ id: user.id, email: user }, process.env.JWT_SECRET);
 
-      return token;
+      let response = {
+        token:token,
+        user_id:user.id
+      }
+      return response;
 
     } catch (error) {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -33,19 +37,19 @@ export class AuthService {
   }
 
 
-    async verifyToken(token: string) {
-      try {
-        if (!process.env.JWT_SECRET) {
-          throw new HttpException('Error interno del servidor', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-  
-        const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
-  
-        return { valid: true, decoded };
-      } catch (error) {
-        return { valid: false, error: error.message }; 
+  async verifyToken(token: string) {
+    try {
+      if (!process.env.JWT_SECRET) {
+        throw new HttpException('Error interno del servidor', HttpStatus.INTERNAL_SERVER_ERROR);
       }
+
+      const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
+
+      return { valid: true, decoded };
+    } catch (error) {
+      return { valid: false, error: error.message };
     }
+  }
 
 
 }

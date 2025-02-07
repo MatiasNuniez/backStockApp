@@ -5,46 +5,55 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from '../categories/entities/category.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class ProductsService {
 
   constructor(
     @InjectRepository(Product) private productRepository: Repository<Product>,
-    @InjectRepository(Category) private categoryRepository: Repository<Category>
+    @InjectRepository(Category) private categoryRepository: Repository<Category>,
+    @InjectRepository(User) private userRepository:Repository<User>
   ) { }
 
   async create(createProductDto: CreateProductDto) {
     console.log(createProductDto);
-    
+
     try {
       const category = await this.categoryRepository.findOne({
         where: { id: createProductDto.category },
       });
-  
+
+      const user = await this.userRepository.findOne({ where: { id: createProductDto.userId } })
+
+      if(!user){
+        throw new HttpException('User no encontrado', HttpStatus.NOT_FOUND);
+      }
+
       if (!category) {
         throw new HttpException('Categoría no encontrada', HttpStatus.NOT_FOUND);
       }
-  
+
       const newProduct = this.productRepository.create({
         ...createProductDto,
         category,
+        user
       });
-  
+
       return await this.productRepository.save(newProduct);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  
+
 
   async incrementStock(id: number, quantity: number) {
-    if(!id || !quantity){
+    if (!id || !quantity) {
       throw new HttpException('Id o cantidad no proporcionado', HttpStatus.BAD_REQUEST);
     }
     try {
-      const product = await this.productRepository.findOneBy({id});
-      if(!product){
+      const product = await this.productRepository.findOneBy({ id });
+      if (!product) {
         throw new HttpException('Producto no encontrado', HttpStatus.NOT_FOUND);
       }
       product.stock += quantity;
@@ -55,15 +64,15 @@ export class ProductsService {
   }
 
   async decrementStock(id: number, quantity: number) {
-    if(!id || !quantity){
+    if (!id || !quantity) {
       throw new HttpException('Id o cantidad no proporcionado', HttpStatus.BAD_REQUEST);
     }
     try {
-      const product = await this.productRepository.findOneBy({id});
-      if(!product){
+      const product = await this.productRepository.findOneBy({ id });
+      if (!product) {
         throw new HttpException('Producto no encontrado', HttpStatus.NOT_FOUND);
       }
-      if(product.stock < quantity){
+      if (product.stock < quantity) {
         throw new HttpException('No hay suficiente stock', HttpStatus.BAD_REQUEST);
       }
       product.stock -= quantity;
@@ -79,11 +88,11 @@ export class ProductsService {
       const products = await this.productRepository.find({
         relations: ["category"],
       });
-  
+
       if (!products.length) {
         throw new HttpException('No hay productos', HttpStatus.NOT_FOUND);
       }
-  
+
       return products.map(product => ({
         id: product.id,
         name: product.name,
@@ -96,7 +105,7 @@ export class ProductsService {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  
+
 
   async findOne(id: number) {
     if (!id) {
@@ -118,38 +127,38 @@ export class ProductsService {
     if (!id) {
       throw new HttpException('Id no proporcionado', HttpStatus.BAD_REQUEST);
     }
-  
+
     try {
       const product = await this.productRepository.findOne({
         where: { id },
       });
-  
+
       if (!product) {
         throw new HttpException('Producto no encontrado', HttpStatus.NOT_FOUND);
       }
-  
+
       let category = product.category;
       if (updateProductDto.category) {
         category = await this.categoryRepository.findOne({
           where: { id: updateProductDto.category },
         });
-  
+
         if (!category) {
           throw new HttpException('Categoría no encontrada', HttpStatus.NOT_FOUND);
         }
       }
-  
+
       await this.productRepository.update(id, {
         ...updateProductDto,
         category,
       });
-  
+
       return await this.productRepository.findOne({ where: { id }, relations: ['category'] });
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  
+
 
   async remove(id: number) {
     if (!id) {
