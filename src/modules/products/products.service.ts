@@ -90,7 +90,7 @@ export class ProductsService {
       });
 
       if (!products.length) {
-        throw new HttpException('No hay productos', HttpStatus.NOT_FOUND);
+        return [];
       }
 
       return products.map(product => ({
