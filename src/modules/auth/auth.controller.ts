@@ -1,23 +1,30 @@
-import { Controller, Get, Post, Body, HttpCode, HttpStatus, Headers, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
-import { AuthService } from './auth.service';
+import { Public } from 'src/common/decorators/public.decorator';
 import { CreateUserDto } from '../user/dto/create-user.dto';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async Login(@Body() createAuthDto: CreateUserDto, @Res({ passthrough: true }) res: Response) {
-    const {user_id, token} = await this.authService.create(createAuthDto);
-    res.cookie('userId',user_id);
+  async Login(
+    @Body() createAuthDto: CreateUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { user_id, token } = await this.authService.create(createAuthDto);
+    res.cookie('userId', user_id);
     res.cookie('token', token);
     return { msj: 'Inicio exitoso' };
-  }
-
-  @Get('verify')
-  verifyToken(@Headers('Authorization') token: string) {
-    return this.authService.verifyToken(token);
   }
 }

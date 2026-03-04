@@ -1,0 +1,45 @@
+services:
+  # ── PostgreSQL LTS ──────────────────────────────────────────────────────────
+  db:
+    image: postgres:17-alpine
+    container_name: distribuidora_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── NestJS API ───────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: distribuidora_api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Sobreescribe DB_HOST para que apunte al servicio de Docker, no a localhost
+      DB_HOST: db
+    ports:
+      - "${PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # Hot-reload: monta el source sin node_modules
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
+    driver: local
